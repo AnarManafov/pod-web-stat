@@ -1,0 +1,3 @@
+[submodule "Include"]
+	path = Include
+	url = ssh://anar@demac012.gsi.de//Users/anar/GitRepository/PROOFOnDemand/MiscCommon
