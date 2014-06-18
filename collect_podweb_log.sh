@@ -1,6 +1,32 @@
 #! /usr/bin/env bash
 
-WORKDIR=$(readlink -f $0)
+#=============================================================================
+# ***** a portable version of "readlink -f" *****
+# needed because MacOSX doesn't support readlink -f
+#=============================================================================
+my_readlink()
+{
+TARGET_FILE=$1
+
+cd `dirname $TARGET_FILE`
+TARGET_FILE=`basename $TARGET_FILE`
+
+# Iterate down a (possible) chain of symlinks
+while [ -L "$TARGET_FILE" ]
+do
+TARGET_FILE=`readlink $TARGET_FILE`
+cd `dirname $TARGET_FILE`
+TARGET_FILE=`basename $TARGET_FILE`
+done
+
+# Compute the canonicalized name by finding the physical path 
+# for the directory we're in and appending the target file.
+PHYS_DIR=`pwd -P`
+RESULT=$PHYS_DIR/$TARGET_FILE
+echo $RESULT
+}
+#=============================================================================
+WORKDIR=$(my_readlink $0)
 WORKDIR=$(dirname $WORKDIR)
 LOG_TMP="$WORKDIR/log.tmp"
 # merged log - the history with only unique entries
@@ -40,7 +66,7 @@ if [ -d "$WORKDIR/PoDWebsite" ]; then
    git pull
    popd
 else
-   git clone ssh://anar@demac012.gsi.de//Users/anar/GitRepository/PROOFonDemand/PoDWebsite
+   git clone git@github.com:AnarManafov/PoDWebsite.git
 fi
 
 $WORKDIR/collect_country.sh $WORKDIR
